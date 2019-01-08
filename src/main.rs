@@ -3,6 +3,7 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::path::Path;
 
+use keikaku::eval::{Env, Eval};
 use keikaku::lexer::Source;
 use keikaku::parser::Ast;
 
@@ -27,6 +28,14 @@ fn main() {
     let mut chars = source.chars();
     let lexer = Source::new(filename, &mut chars);
     let ast = Ast::parse(&mut lexer.tokenize().peekable())
-        .unwrap_or_else(|e| abort(&format!("Parse error: {:?}", e)));
-    println!("{:?}", ast);
+        .unwrap_or_else(|e| abort(&format!("Parse error: {}", e)));
+
+    let mut env = Env::default();
+    let mut eval = Eval::new(&mut env);
+    for (expr, span) in ast {
+        let res = eval
+            .eval(&expr, span)
+            .unwrap_or_else(|e| abort(&format!("Eval error: {}", e)));
+        println!("{}", res);
+    }
 }

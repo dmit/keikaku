@@ -1,3 +1,5 @@
+use std::fmt::{self, Display, Formatter};
+
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct Position {
     line: usize,
@@ -11,16 +13,24 @@ impl Position {
             to: other,
         }
     }
+}
 
-    pub fn as_string(&self) -> String {
-        format!("{}:{}", self.line + 1, self.col)
+impl Display for Position {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}:{}", self.line + 1, self.col + 1)
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Span {
-    from: Position,
-    to: Position,
+    pub from: Position,
+    pub to: Position,
+}
+
+impl Display for Span {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}-{}", self.from, self.to)
+    }
 }
 
 pub struct Source<'a, I>
